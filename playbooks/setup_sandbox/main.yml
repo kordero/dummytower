@@ -1,0 +1,21 @@
+- hosts: all
+  sudo: yes
+  vars:
+    username: "{{ nickname }}"
+    repo: "https://github.com/{{ nickname }}/{{ repo_name }}"
+    branch: "{{ job_id }}"
+    home_dir: "/home/{{ nickname }}"
+    www_dir: "{{ home_dir }}/public_html/"
+    sb_dest: "{{ www_dir }}{{ repo_name }}_{{ job_id }}"
+  tasks:
+    - name: ensure that user exists or create it otherwise
+      user: name="{{ username }}" password="{{ crypted_pass }}" update_password=on_create shell="/bin/bash"
+      register: user_created
+
+    - name: clone sandbox at the right branch
+      git: repo="{{ repo }}" dest="{{ sb_dest }}" version="{{ branch }}"
+      register: sb_created
+
+    - name: update files permissions
+      file: path="{{ www_dir }}" owner="{{ username }}" group="{{ username }}" state=directory recurse=yes
+      when: sb_created.changed
