@@ -19,3 +19,8 @@
     - name: update files permissions
       file: path="{{ www_dir }}" owner="{{ username }}" group="{{ username }}" state=directory recurse=yes
       when: sb_created.changed
+
+    - name: run sandbox setup
+      shell: setup.sh chdir="{{ sb_dest }}" executable=/bin/bash creates="{{ sb_dest }}/composer.lock"
+      sudo_user: "{{ username }}"
+      when: sb_created.changed
