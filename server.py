@@ -21,12 +21,15 @@ class TowerServer(BaseHTTPServer.BaseHTTPRequestHandler):
       if not 'action' in data:
         # action not defined
         self.send_response(404)
-        self.end_headers()
       else:
-        self.send_response(200)
-        self.end_headers()
         api = TowerApi()
         ret = api.run(data, remote_address)
+        if ret:
+          # running API action succeded
+          self.send_response(200)
+        else:
+          # something went wrong when running API action
+          self.send_response(400)
     elif self.path == '/webhook':
       #
       # here is were we should point GH json webhooks to
@@ -42,10 +45,10 @@ class TowerServer(BaseHTTPServer.BaseHTTPRequestHandler):
       #else:
       #  self.send_response(404)
       self.send_response(200)
-      self.end_headers()
     else:
       self.send_response(404)
-      self.end_headers()
+
+    self.end_headers()
 
 if __name__ == '__main__':
   httpd = BaseHTTPServer.HTTPServer((HOST_NAME, PORT_NUMBER), TowerServer)
