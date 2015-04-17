@@ -10,7 +10,6 @@
   tasks:
     - name: ensure that user exists
       user: name="{{ username }}" password="{{ crypted_pass }}" update_password=on_create shell="/bin/bash"
-      register: user_created
 
     - name: clone sandbox
       git: repo="{{ repo }}" dest="{{ sb_dest }}" version="{{ branch }}"
