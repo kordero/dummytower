@@ -8,11 +8,11 @@
     www_dir: "{{ home_dir }}/public_html/"
     sb_dest: "{{ www_dir }}{{ repo_name }}_{{ job_id }}"
   tasks:
-    - name: ensure that user exists or create it otherwise
+    - name: ensure that user exists
       user: name="{{ username }}" password="{{ crypted_pass }}" update_password=on_create shell="/bin/bash"
       register: user_created
 
-    - name: clone sandbox at the right branch
+    - name: clone sandbox
       git: repo="{{ repo }}" dest="{{ sb_dest }}" version="{{ branch }}"
       register: sb_created
 
@@ -21,6 +21,6 @@
       when: sb_created.changed
 
     - name: run sandbox setup
-      shell: setup.sh chdir="{{ sb_dest }}" executable=/bin/bash creates="{{ sb_dest }}/composer.lock"
+      shell: executable="/bin/bash" chdir="{{ sb_dest }}" creates="{{ sb_dest }}/composer.lock" "{{ sb_dest }}/setup.sh"
       sudo_user: "{{ username }}"
       when: sb_created.changed
